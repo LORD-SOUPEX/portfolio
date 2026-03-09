@@ -168,16 +168,72 @@ img {
     align-items: center;
 }
 
-.logo {
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--text-main);
-    letter-spacing: -0.5px;
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-alt));
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
-.logo span {
+.brand-logo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(227, 176, 75, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.brand-logo:hover {
+    border-color: var(--accent-main);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px var(--accent-glow);
+}
+
+.brand-logo:hover::before {
+    left: 100%;
+}
+
+.brand-text {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    position: relative;
+    z-index: 1;
+}
+
+.brand-dot {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
     color: var(--accent-main);
+    position: relative;
+    z-index: 1;
+}
+
+.tech-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all var(--transition-fast);
+}
+
+.tech-link:hover {
+    color: var(--accent-main);
+    transform: translateY(-2px);
 }
 
 .nav-links {
@@ -885,11 +941,14 @@ img {
 .footer-links {
     display: flex;
     gap: 24px;
+    align-items: center;
 }
 
 .footer-links a {
     color: var(--text-main);
     font-weight: 500;
+    display: flex;
+    align-items: center;
 }
 
 .footer-links a:hover {

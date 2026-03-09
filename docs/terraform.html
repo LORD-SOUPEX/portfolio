@@ -7,23 +7,570 @@
     <meta name="description" content="Infrastructure as Code avec Terraform par Brice Doublet.">
     <title>Terraform | Brice Doublet</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
-
-    <!-- CSS File -->
     <link rel="stylesheet" href="assets/style.css">
+
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ===== Terraform Page Specific Styles ===== */
+        :root {
+            --tf-purple: #7B42F6;
+            --tf-blue: #5C4EE5;
+            --tf-cyan: #1BA8F0;
+        }
+
+        /* Isometric Grid Background */
+        .tf-bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(227, 176, 75, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(227, 176, 75, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Hero 3D */
+        .tf-hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+        }
+
+        .tf-hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tf-hero-text {
+            z-index: 2;
+        }
+
+        .tf-hero-3d {
+            position: relative;
+            height: 450px;
+            z-index: 1;
+        }
+
+        #tf-canvas-3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .tf-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 100px;
+            background: rgba(227, 176, 75, 0.1);
+            border: 1px solid rgba(227, 176, 75, 0.3);
+            color: var(--accent-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .tf-title {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            font-family: var(--font-heading);
+        }
+
+        .tf-title span {
+            background: linear-gradient(135deg, var(--accent-main), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tf-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .tf-hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .tf-stat {
+            text-align: center;
+        }
+
+        .tf-stat-num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: var(--accent-main);
+            line-height: 1;
+        }
+
+        .tf-stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Code Editor */
+        .tf-editor-section {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .tf-section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .tf-section-tag {
+            color: var(--accent-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .tf-section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-family: var(--font-heading);
+            margin-bottom: 16px;
+        }
+
+        .tf-section-desc {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .tf-editor {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .tf-editor-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 20px;
+            background: #1a1a2e;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tf-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .tf-dot-r {
+            background: #ff5f57;
+        }
+
+        .tf-dot-y {
+            background: #febc2e;
+        }
+
+        .tf-dot-g {
+            background: #28c840;
+        }
+
+        .tf-editor-filename {
+            margin-left: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tf-editor-body {
+            background: #0d1117;
+            padding: 30px;
+            min-height: 350px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tf-code-line {
+            display: flex;
+            gap: 16px;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .tf-code-line.visible {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.3s ease;
+        }
+
+        .tf-line-num {
+            color: #484f58;
+            min-width: 24px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .tf-line-content {
+            white-space: pre;
+        }
+
+        .c-keyword {
+            color: #ff7b72;
+        }
+
+        .c-string {
+            color: #a5d6ff;
+        }
+
+        .c-type {
+            color: #d2a8ff;
+        }
+
+        .c-prop {
+            color: #79c0ff;
+        }
+
+        .c-value {
+            color: #7ee787;
+        }
+
+        .c-comment {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .c-bracket {
+            color: #e6edf3;
+        }
+
+        .tf-cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--accent-main);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .tf-terminal {
+            max-width: 900px;
+            margin: 30px auto 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .tf-terminal-bar {
+            padding: 10px 16px;
+            background: #1a1a2e;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tf-terminal-body {
+            background: #0a0a12;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            min-height: 120px;
+        }
+
+        .tf-term-line {
+            opacity: 0;
+        }
+
+        .tf-term-line.visible {
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .tf-term-success {
+            color: #7ee787;
+        }
+
+        .tf-term-info {
+            color: #79c0ff;
+        }
+
+        .tf-term-warning {
+            color: #e3b04b;
+        }
+
+        .tf-term-prompt {
+            color: #8b949e;
+        }
+
+        /* Infrastructure Diagram */
+        .tf-infra-section {
+            padding: 120px 0;
+        }
+
+        #tf-infra-canvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        /* Skills Cards */
+        .tf-skills-section {
+            padding: 120px 0;
+        }
+
+        .tf-skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tf-skill-card {
+            background: rgba(26, 26, 46, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tf-skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-main), var(--tf-purple));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .tf-skill-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(227, 176, 75, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .tf-skill-card:hover::before {
+            opacity: 1;
+        }
+
+        .tf-skill-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: rgba(227, 176, 75, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--accent-main);
+            transition: all 0.4s;
+            border: 1px solid rgba(227, 176, 75, 0.2);
+        }
+
+        .tf-skill-card:hover .tf-skill-icon {
+            background: rgba(227, 176, 75, 0.2);
+            transform: scale(1.1);
+        }
+
+        .tf-skill-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            margin-bottom: 10px;
+        }
+
+        .tf-skill-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Workflow Timeline */
+        .tf-workflow-section {
+            padding: 120px 0;
+        }
+
+        .tf-workflow {
+            display: flex;
+            justify-content: center;
+            max-width: 1000px;
+            margin: 60px auto;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .tf-workflow::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(227, 176, 75, 0.3), transparent);
+            z-index: 0;
+        }
+
+        .tf-wf-step {
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        .tf-wf-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(227, 176, 75, 0.08);
+            border: 2px solid rgba(227, 176, 75, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--accent-main);
+            transition: all 0.4s;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tf-wf-icon:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-main);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .tf-wf-cmd {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-main);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tf-wf-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .tf-skills-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tf-hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .tf-hero-3d {
+                height: 350px;
+            }
+
+            .tf-hero-stats {
+                justify-content: center;
+            }
+
+            .tf-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tf-skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tf-hero-3d {
+                height: 280px;
+            }
+
+            .tf-hero-stats {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .tf-workflow::before {
+                display: none;
+            }
+
+            .tf-editor-body {
+                font-size: 0.75rem;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- Interactive Background -->
+    <div class="tf-bg-grid"></div>
     <canvas id="bg-canvas"></canvas>
-
-    <!-- Scroll Progress Indicator -->
     <div class="progress-bar" id="progressBar"></div>
 
     <!-- Navigation -->
@@ -32,11 +579,10 @@
             <a href="index.html" class="brand-logo">
                 <span class="brand-text">BD</span><span class="brand-dot">.</span>
             </a>
-
             <nav class="nav-links">
                 <a href="index.html" class="nav-link">Retour à l'accueil</a>
+                <a href="ansible.html" class="nav-link">Ansible</a>
             </nav>
-
             <button class="mobile-menu-btn" aria-label="Toggle menu">
                 <span class="hamburger"></span>
             </button>
@@ -44,33 +590,153 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
-        <section class="hero" id="home">
-            <div class="container hero-content" style="grid-template-columns: 1fr; text-align: center;">
-                <div class="hero-text animate-on-scroll">
-                    <div style="display: flex; justify-content: center; margin-bottom: 24px;">
-                        <svg viewBox="0 0 256 256" width="64" height="64" fill="var(--accent-main)">
-                            <path
-                                d="M153.254.013v81.168l70.158 40.522V40.505L153.254.013zm-81.338 46.993v81.144L142.064 168.7V87.53L71.916 47.005zm0 94.01V222.16L142.064 256v-81.168l-70.148-33.816zm-71.916.032v81.169l70.148 40.513v-81.159L0 141.047z" />
-                        </svg>
-                    </div>
-                    <p class="greeting" style="font-size: 1.5rem;">Technologie Maîtrisée</p>
-                    <h1 class="hero-title">Terraform <br><span>Infrastructure as Code</span></h1>
-                    <h2 class="hero-subtitle">Provisionnement & Déploiement Cloud</h2>
-                    <p class="hero-desc" style="margin-left: auto; margin-right: auto; max-width: 800px;">
-                        Gestion des infrastructures complexes avec du code. Provisionnement reproductible et sécurisé
-                        sur tous les principaux fournisseurs Cloud. Audit et versionnement de l'infrastructure de A à Z.
-                    </p>
-                    <div class="hero-cta" style="justify-content: center; text-align: center; flex-wrap: wrap;">
+        <!-- ===== HERO ===== -->
+        <section class="tf-hero">
+            <div class="tf-hero-grid">
+                <div class="tf-hero-text">
+                    <div class="tf-badge">Infrastructure as Code</div>
+                    <h1 class="tf-title">Terra<span>form</span></h1>
+                    <p class="tf-subtitle">Provisionnement d'infrastructures cloud reproductible, sécurisé et versionné.
+                        Du code à la production en quelques commandes.</p>
+                    <div class="hero-cta" style="justify-content: flex-start;">
                         <a href="index.html" class="btn btn-primary">Retour à l'accueil</a>
+                        <a href="#tf-editor" class="btn btn-secondary">Voir en action ↓</a>
+                    </div>
+                    <div class="tf-hero-stats">
+                        <div class="tf-stat">
+                            <div class="tf-stat-num">3000+</div>
+                            <div class="tf-stat-label">Providers</div>
+                        </div>
+                        <div class="tf-stat">
+                            <div class="tf-stat-num">HCL</div>
+                            <div class="tf-stat-label">Langage</div>
+                        </div>
+                        <div class="tf-stat">
+                            <div class="tf-stat-num">∞</div>
+                            <div class="tf-stat-label">Scalabilité</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tf-hero-3d">
+                    <canvas id="tf-canvas-3d"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CODE EDITOR ===== -->
+        <section class="tf-editor-section" id="tf-editor">
+            <div class="container">
+                <div class="tf-section-header animate-on-scroll">
+                    <div class="tf-section-tag">Live Code</div>
+                    <h2 class="tf-section-title">Infrastructure en quelques lignes</h2>
+                    <p class="tf-section-desc">Découvrez la puissance du HCL : déclarez votre infrastructure, et
+                        Terraform la construit.</p>
+                </div>
+                <div class="tf-editor animate-on-scroll" id="codeEditor">
+                    <div class="tf-editor-bar">
+                        <div class="tf-dot tf-dot-r"></div>
+                        <div class="tf-dot tf-dot-y"></div>
+                        <div class="tf-dot tf-dot-g"></div>
+                        <span class="tf-editor-filename">main.tf</span>
+                    </div>
+                    <div class="tf-editor-body" id="codeBody"></div>
+                </div>
+                <div class="tf-terminal animate-on-scroll" id="terminal">
+                    <div class="tf-terminal-bar">
+                        <span>▸</span> <span>Terminal — terraform</span>
+                    </div>
+                    <div class="tf-terminal-body" id="terminalBody"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INFRASTRUCTURE DIAGRAM ===== -->
+        <section class="tf-infra-section" id="tf-infra">
+            <div class="container">
+                <div class="tf-section-header animate-on-scroll">
+                    <div class="tf-section-tag">Architecture</div>
+                    <h2 class="tf-section-title">Visualisation d'Infrastructure</h2>
+                    <p class="tf-section-desc">Un aperçu interactif de l'architecture cloud provisionnée avec Terraform.
+                    </p>
+                </div>
+                <canvas id="tf-infra-canvas" class="animate-on-scroll"></canvas>
+            </div>
+        </section>
+
+        <!-- ===== SKILLS ===== -->
+        <section class="tf-skills-section" id="tf-skills">
+            <div class="container">
+                <div class="tf-section-header animate-on-scroll">
+                    <div class="tf-section-tag">Expertise</div>
+                    <h2 class="tf-section-title">Compétences Terraform</h2>
+                    <p class="tf-section-desc">Maîtrise complète de l'écosystème Terraform pour des déploiements
+                        fiables.</p>
+                </div>
+                <div class="tf-skills-grid">
+                    <div class="tf-skill-card animate-on-scroll">
+                        <div class="tf-skill-icon">MODULES</div>
+                        <div class="tf-skill-name">Modules</div>
+                        <p class="tf-skill-desc">Architecture modulaire réutilisable. Création de modules internes pour
+                            standardiser les déploiements.</p>
+                    </div>
+                    <div class="tf-skill-card animate-on-scroll delay-1">
+                        <div class="tf-skill-icon">CLOUD</div>
+                        <div class="tf-skill-name">Multi-Cloud</div>
+                        <p class="tf-skill-desc">Déploiement sur AWS, Azure et GCP. Gestion unifiée des providers cloud.
+                        </p>
+                    </div>
+                    <div class="tf-skill-card animate-on-scroll delay-2">
+                        <div class="tf-skill-icon">STATE</div>
+                        <div class="tf-skill-name">State Management</div>
+                        <p class="tf-skill-desc">Gestion sécurisée du state avec backend remote, locking et encryption.
+                        </p>
+                    </div>
+                    <div class="tf-skill-card animate-on-scroll delay-1">
+                        <div class="tf-skill-icon">CI/CD</div>
+                        <div class="tf-skill-name">CI/CD Integration</div>
+                        <p class="tf-skill-desc">Intégration dans les pipelines GitLab CI, GitHub Actions avec plan
+                            automatisé.</p>
+                    </div>
+                    <div class="tf-skill-card animate-on-scroll delay-2">
+                        <div class="tf-skill-icon">POLICY</div>
+                        <p class="tf-skill-desc">Validation avec Sentinel et OPA. Conformité automatisée avant chaque
+                            déploiement.</p>
+                    </div>
+                    <div class="tf-skill-card animate-on-scroll delay-3">
+                        <div class="tf-skill-icon">WORK</div>
+                        <div class="tf-skill-name">Workspaces</div>
+                        <p class="tf-skill-desc">Gestion multi-environnements (dev, staging, prod) avec workspaces
+                            isolés.</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="scroll-indicator">
-                <p>Scroll</p>
-                <div class="mouse">
-                    <div class="wheel"></div>
+        <!-- ===== WORKFLOW ===== -->
+        <section class="tf-workflow-section" id="tf-workflow">
+            <div class="container">
+                <div class="tf-section-header animate-on-scroll">
+                    <div class="tf-section-tag">Workflow</div>
+                    <h2 class="tf-section-title">Le Cycle Terraform</h2>
+                    <p class="tf-section-desc">Quatre commandes pour gouverner votre infrastructure.</p>
+                </div>
+                <div class="tf-workflow">
+                    <div class="tf-wf-step animate-on-scroll">
+                        <div class="tf-wf-icon">INIT</div>
+                        <p class="tf-wf-label">Initialisation du projet et téléchargement des providers.</p>
+                    </div>
+                    <div class="tf-wf-step animate-on-scroll" data-delay="150">
+                        <div class="tf-wf-icon">PLAN</div>
+                        <p class="tf-wf-label">Prévisualisation des changements avant application.</p>
+                    </div>
+                    <div class="tf-wf-step animate-on-scroll" data-delay="300">
+                        <div class="tf-wf-icon">APPLY</div>
+                        <p class="tf-wf-label">Déploiement de l'infrastructure déclarée.</p>
+                    </div>
+                    <div class="tf-wf-step animate-on-scroll" data-delay="450">
+                        <div class="tf-wf-icon">DESTROY</div>
+                        <p class="tf-wf-label">Suppression propre de toute l'infrastructure.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -85,7 +751,6 @@
                 </a>
                 <p>Création numérique & Innovation.</p>
             </div>
-
             <div class="footer-links" style="align-items: center;">
                 <a href="ansible.html" class="tech-link" aria-label="Ansible" title="Ansible">
                     <svg viewBox="0 0 422 422" width="24" height="24" fill="currentColor">
@@ -104,14 +769,13 @@
                     aria-label="LinkedIn">LinkedIn</a>
             </div>
         </div>
-
         <div class="footer-bottom">
             <p>&copy; <span id="currentYear"></span> Brice Doublet. Tous droits réservés.</p>
         </div>
     </footer>
 
-    <!-- JavaScript File -->
     <script src="assets/script.js"></script>
+    <script src="assets/terraform.js"></script>
 </body>
 
 </html>

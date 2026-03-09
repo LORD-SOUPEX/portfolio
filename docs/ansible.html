@@ -7,23 +7,305 @@
     <meta name="description" content="Automatisation et Configuration avec Ansible par Brice Doublet.">
     <title>Ansible | Brice Doublet</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
-
-    <!-- CSS File -->
     <link rel="stylesheet" href="assets/style.css">
+
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ===== Ansible Page Specific Styles ===== */
+        :root {
+            --ansible-red: #EE0000;
+            --ansible-dark: #121212;
+        }
+
+        /* Isometric Grid Background */
+        .ans-bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(238, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(238, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Hero 3D */
+        .ans-hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+        }
+
+        .ans-hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ans-hero-3d {
+            position: relative;
+            height: 450px;
+            z-index: 1;
+        }
+
+        #ans-canvas-3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .ans-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 100px;
+            background: rgba(238, 0, 0, 0.1);
+            border: 1px solid rgba(238, 0, 0, 0.3);
+            color: var(--accent-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .ans-title {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            font-family: var(--font-heading);
+        }
+
+        .ans-title span {
+            background: linear-gradient(135deg, var(--accent-main), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ans-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        /* Playbook Editor */
+        .ans-editor-section {
+            padding: 120px 0;
+        }
+
+        .ans-editor {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .ans-editor-bar {
+            padding: 14px 20px;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ans-editor-body {
+            background: #0d1117;
+            padding: 30px;
+            min-height: 350px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #e6edf3;
+            line-height: 1.8;
+        }
+
+        .ans-terminal {
+            max-width: 900px;
+            margin: 30px auto 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0a0a12;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Orchestration Diagram */
+        .ans-infra-section {
+            padding: 120px 0;
+        }
+
+        #ans-infra-canvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        /* Expertise Grid 3x2 */
+        .ans-skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .ans-skill-card {
+            background: rgba(26, 26, 46, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s;
+        }
+
+        .ans-skill-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(227, 176, 75, 0.3);
+        }
+
+        .ans-skill-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: rgba(227, 176, 75, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--accent-main);
+            border: 1px solid rgba(227, 176, 75, 0.2);
+        }
+
+        /* Workflow Timeline */
+        .ans-workflow {
+            display: flex;
+            justify-content: center;
+            max-width: 1000px;
+            margin: 60px auto;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .ans-wf-step {
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        .ans-wf-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(227, 176, 75, 0.08);
+            border: 2px solid rgba(227, 176, 75, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--accent-main);
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+
+        .ans-wf-icon:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-main);
+        }
+
+        /* General sections */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            color: var(--accent-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-family: var(--font-heading);
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .ans-hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .ans-skills-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ans-skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ans-hero-3d {
+                height: 300px;
+            }
+
+            .ans-workflow::before {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- Interactive Background -->
+    <div class="ans-bg-grid"></div>
     <canvas id="bg-canvas"></canvas>
-
-    <!-- Scroll Progress Indicator -->
     <div class="progress-bar" id="progressBar"></div>
 
     <!-- Navigation -->
@@ -32,11 +314,10 @@
             <a href="index.html" class="brand-logo">
                 <span class="brand-text">BD</span><span class="brand-dot">.</span>
             </a>
-
             <nav class="nav-links">
                 <a href="index.html" class="nav-link">Retour à l'accueil</a>
+                <a href="terraform.html" class="nav-link">Terraform</a>
             </nav>
-
             <button class="mobile-menu-btn" aria-label="Toggle menu">
                 <span class="hamburger"></span>
             </button>
@@ -44,34 +325,139 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
-        <section class="hero" id="home">
-            <div class="container hero-content" style="grid-template-columns: 1fr; text-align: center;">
-                <div class="hero-text animate-on-scroll">
-                    <div style="display: flex; justify-content: center; margin-bottom: 24px;">
-                        <svg viewBox="0 0 422 422" width="64" height="64" fill="var(--accent-main)">
-                            <path
-                                d="M211 0C94.469 0 0 94.469 0 211s94.469 211 211 211 211-94.469 211-211S327.531 0 211 0zm88.854 309.281L239.115 159.25l-21.729-57.083-22.156 57.083-65.042 165.75c-3.146 7.562-10.74 11.75-18.427 10.146-7.667-1.583-13.344-8-13.688-15.823-.198-4.469 2.052-8.677 5.865-11.219l121.281-229.073c4.188-7.854 13.906-11.146 22.063-7.469 4.312 1.948 7.76 5.51 9.614 9.948l96.792 233.198c2.948 7.021-.115 15.114-6.844 18.062-6.729 2.948-14.479-.115-17.427-6.844-1.219-2.781-1.635-5.875-1.198-8.896l11.458-37.115H215.365l-20.843 54.344c-2.73 7.104-10.198 11.23-17.656 9.719-7.469-1.51-12.823-8.083-12.656-15.656.104-3.792 1.635-7.385 4.323-9.948l131.334-97.104zm-81.677-16.146h52.125l-26.063-74.885-26.062 74.885v.001z" />
-                        </svg>
-                    </div>
-                    <p class="greeting" style="font-size: 1.5rem;">Technologie Maîtrisée</p>
-                    <h1 class="hero-title">Ansible <br><span>Automatisation</span></h1>
-                    <h2 class="hero-subtitle">Configuration & Déploiement</h2>
-                    <p class="hero-desc" style="margin-left: auto; margin-right: auto; max-width: 800px;">
-                        Déploiement centralisé, gestion des configurations, et automatisation des tâches sur des
-                        centaines de serveurs simultanément. Réduction des erreurs humaines et gain de temps
-                        considérable grâce à l'orchestration IT.
-                    </p>
-                    <div class="hero-cta" style="justify-content: center; text-align: center; flex-wrap: wrap;">
+        <!-- ===== HERO ===== -->
+        <section class="ans-hero">
+            <div class="ans-hero-grid">
+                <div class="ans-hero-text animate-on-scroll">
+                    <div class="ans-badge">Configuration Management</div>
+                    <h1 class="ans-title">Ans<span>ible</span></h1>
+                    <p class="ans-subtitle">Automatisation radicale de vos déploiements et de la configuration de votre
+                        parc serveur.</p>
+                    <div class="hero-cta" style="justify-content: flex-start;">
                         <a href="index.html" class="btn btn-primary">Retour à l'accueil</a>
+                        <a href="#ans-editor" class="btn btn-secondary">Voir Playbooks ↓</a>
+                    </div>
+                </div>
+                <div class="ans-hero-3d">
+                    <canvas id="ans-canvas-3d"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PLAYBOOK EDITOR ===== -->
+        <section class="ans-editor-section" id="ans-editor">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-tag">Automation</div>
+                    <h2 class="section-title">Playbooks & Orchestration</h2>
+                    <p class="section-desc">Écrivez en YAML simple, automatisez à l'infini. Ansible s'occupe du reste
+                        sur tout votre parc.</p>
+                </div>
+                <div class="ans-editor animate-on-scroll">
+                    <div class="ans-editor-bar">
+                        <div class="tf-dot tf-dot-r"
+                            style="width:12px;height:12px;border-radius:50%;background:#ff5f57;"></div>
+                        <div class="tf-dot tf-dot-y"
+                            style="width:12px;height:12px;border-radius:50%;background:#febc2e;"></div>
+                        <div class="tf-dot tf-dot-g"
+                            style="width:12px;height:12px;border-radius:50%;background:#28c840;"></div>
+                        <span
+                            style="margin-left:12px;color:rgba(255,255,255,0.5);font-size:0.8rem;font-family:'JetBrains Mono'">setup_webserver.yml</span>
+                    </div>
+                    <div class="ans-editor-body" id="playbookBody"></div>
+                </div>
+                <div class="ans-terminal animate-on-scroll" id="ansTerminal"></div>
+            </div>
+        </section>
+
+        <!-- ===== ORCHESTRATION DIAGRAM ===== -->
+        <section class="ans-infra-section">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-tag">Orchestration</div>
+                    <h2 class="section-title">Contrôle Centralisé</h2>
+                    <p class="section-desc">Visualisez comment Ansible propage les configurations de façon agentless et
+                        sécurisée.</p>
+                </div>
+                <canvas id="ans-infra-canvas" class="animate-on-scroll"></canvas>
+            </div>
+        </section>
+
+        <!-- ===== EXPERTISE ===== -->
+        <section class="ans-skills-section">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-tag">Expertise</div>
+                    <h2 class="section-title">Compétences Ansible</h2>
+                    <p class="section-desc">Une maîtrise approfondie pour des infrastructures robustes et
+                        reproductibles.</p>
+                </div>
+                <div class="ans-skills-grid">
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">PLAYBOOKS</div>
+                        <h3 class="ans-skill-name">Playbooks</h3>
+                        <p class="ans-skill-desc">Conception de playbooks YAML complexes pour l'automatisation de bout
+                            en bout.</p>
+                    </div>
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">ROLES</div>
+                        <h3 class="ans-skill-name">Roles & Collections</h3>
+                        <p class="ans-skill-desc">Modularisation du code Ansible pour une réutilisabilité maximale sur
+                            différents projets.</p>
+                    </div>
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">VAULT</div>
+                        <h3 class="ans-skill-name">Ansible Vault</h3>
+                        <p class="ans-skill-desc">Gestion sécurisée des secrets, mots de passe et certificats via
+                            chiffrement AES.</p>
+                    </div>
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">INVENTORY</div>
+                        <h3 class="ans-skill-name">Dynamic Inventory</h3>
+                        <p class="ans-skill-desc">Gestion d'inventaires dynamiques pour AWS, Azure et environnements
+                            hybrides.</p>
+                    </div>
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">CI/CD</div>
+                        <h3 class="ans-skill-name">CI/CD Integration</h3>
+                        <p class="ans-skill-desc">Automatisation du testing de roles (Molecule) et intégration dans
+                            GitLab/GitHub.</p>
+                    </div>
+                    <div class="ans-skill-card animate-on-scroll">
+                        <div class="ans-skill-icon">GALAXY</div>
+                        <h3 class="ans-skill-name">Ansible Galaxy</h3>
+                        <p class="ans-skill-desc">Utilisation et contribution à la communauté pour accélérer les
+                            déploiements.</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="scroll-indicator">
-                <p>Scroll</p>
-                <div class="mouse">
-                    <div class="wheel"></div>
+        <!-- ===== WORKFLOW ===== -->
+        <section class="ans-workflow-section">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-tag">Workflow</div>
+                    <h2 class="section-title">L'Approche Ansible</h2>
+                    <p class="section-desc">Quatre étapes pour une configuration sans faille.</p>
+                </div>
+                <div class="ans-workflow">
+                    <div class="ans-wf-step animate-on-scroll">
+                        <div class="ans-wf-icon">INVENTORY</div>
+                        <p class="ans-wf-label">Ciblage des serveurs et groupes d'hôtes.</p>
+                    </div>
+                    <div class="ans-wf-step animate-on-scroll">
+                        <div class="ans-wf-icon">PLAYBOOK</div>
+                        <p class="ans-wf-label">Définition de l'état souhaité en YAML.</p>
+                    </div>
+                    <div class="ans-wf-step animate-on-scroll">
+                        <div class="ans-wf-icon">TEST</div>
+                        <p class="ans-wf-label">Validation en mode dry-run (check mode).</p>
+                    </div>
+                    <div class="ans-wf-step animate-on-scroll">
+                        <div class="ans-wf-icon">DEPLOY</div>
+                        <p class="ans-wf-label">Exécution et convergence de l'état.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -86,7 +472,6 @@
                 </a>
                 <p>Création numérique & Innovation.</p>
             </div>
-
             <div class="footer-links" style="align-items: center;">
                 <a href="ansible.html" class="tech-link" aria-label="Ansible" title="Ansible"
                     style="color: var(--accent-main);">
@@ -101,18 +486,14 @@
                             d="M153.254.013v81.168l70.158 40.522V40.505L153.254.013zm-81.338 46.993v81.144L142.064 168.7V87.53L71.916 47.005zm0 94.01V222.16L142.064 256v-81.168l-70.148-33.816zm-71.916.032v81.169l70.148 40.513v-81.159L0 141.047z" />
                     </svg>
                 </a>
-                <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank" rel="noopener noreferrer"
-                    aria-label="LinkedIn">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank"
+                    rel="noopener noreferrer">LinkedIn</a>
             </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; <span id="currentYear"></span> Brice Doublet. Tous droits réservés.</p>
         </div>
     </footer>
 
-    <!-- JavaScript File -->
     <script src="assets/script.js"></script>
+    <script src="assets/ansible.js"></script>
 </body>
 
 </html>

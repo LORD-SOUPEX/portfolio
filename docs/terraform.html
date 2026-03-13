@@ -526,9 +526,18 @@
             .tf-hero-grid {
                 grid-template-columns: 1fr;
                 text-align: center;
+                gap: 40px;
+            }
+
+            .tf-hero-text {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
 
             .tf-hero-3d {
+                order: 1;
                 height: 350px;
             }
 
@@ -553,7 +562,8 @@
 
             .tf-hero-stats {
                 flex-wrap: wrap;
-                gap: 20px;
+                gap: 24px;
+                justify-content: center;
             }
 
             .tf-workflow::before {
@@ -561,8 +571,13 @@
             }
 
             .tf-editor-body {
-                font-size: 0.75rem;
-                padding: 20px;
+                font-size: 0.7rem;
+                padding: 20px 10px;
+            }
+
+            .tf-terminal-body {
+                font-size: 0.7rem;
+                padding: 15px 10px;
             }
         }
     </style>

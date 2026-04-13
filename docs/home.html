@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Portfolio de Brice Doublet, professionnel du web. Découvrez mes projets, mes compétences et mon expérience.">
+    <title>Brice Doublet | Portfolio</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+    <!-- Google Fonts: Outfit for clean, modern headings and Inter for readable body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS File -->
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+
+    <!-- Interactive Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="brand-logo">
+                <span class="brand-text">BD</span><span class="brand-dot">.</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#about" class="nav-link">À propos</a>
+                <a href="#experience" class="nav-link">Expérience</a>
+                <a href="#skills" class="nav-link">Compétences</a>
+                <a href="ansible" class="nav-link">Ansible</a>
+                <a href="terraform" class="nav-link">Terraform</a>
+                <a href="fullstack" class="nav-link">Full-Stack</a>
+                <a href="#contact" class="btn btn-outline">Me Contacter</a>
+            </nav>
+
+            <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text animate-on-scroll">
+                    <p class="greeting">Bonjour, je suis</p>
+                    <h1 class="hero-title">Brice <br><span>Doublet</span></h1>
+                    <h2 class="hero-subtitle">Ingénieur DevOps</h2>
+                    <p class="hero-desc">
+                        Spécialiste de l'automatisation, des pipelines CI/CD et de la robustesse des infrastructures.
+                        Passionné par l'innovation technique.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#contact" class="btn btn-primary">Démarrer un projet</a>
+                        <a href="#about" class="btn btn-secondary">Découvrir mon profil</a>
+                        <a href="assets/CV_Brice_DOUBLET.pdf" class="btn btn-outline" download>Télécharger mon CV</a>
+                    </div>
+                </div>
+
+                <div class="hero-image-container animate-on-scroll delay-1">
+                    <div class="hero-image-bg"></div>
+                    <img src="images/profil.jpg" alt="Photo de profil de Brice Doublet" class="hero-img">
+                    <div class="decorative-element shape-1"></div>
+                    <div class="decorative-element shape-2"></div>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <p>Scroll</p>
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about section" id="about">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <h2 class="section-title">À propos de moi</h2>
+                    <div class="section-line"></div>
+                </div>
+
+                <div class="about-grid">
+                    <div class="about-text animate-on-scroll">
+                        <p class="lead">
+                            Un professionnel dévoué, prêt à relever de nouveaux défis et à apporter de la valeur à
+                            chaque projet.
+                        </p>
+                        <p>
+                            Curieux et rigoureux, je m'appuie sur mon expérience pour concevoir des solutions élégantes
+                            et efficaces. Mon approche combine une vision stratégique avec une exécution technique
+                            précise, en plaçant toujours l'utilisateur au centre de mes réflexions.
+                        </p>
+                        <p>
+                            J'aime travailler dans des environnements dynamiques où l'apprentissage continu est
+                            encouragé et où les idées innovantes peuvent prendre vie.
+                        </p>
+
+                        <div class="stats-container">
+                            <div class="stat-item">
+                                <span class="stat-number">4+</span>
+                                <span class="stat-label">Années<br>d'expérience</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">100%</span>
+                                <span class="stat-label">Démarche<br>CI/CD</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">∞</span>
+                                <span class="stat-label">Passionné par<br>L'informatique</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section class="experience section alt-bg" id="experience">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <h2 class="section-title">Mon Parcours</h2>
+                    <div class="section-line"></div>
+                </div>
+
+                <div class="timeline">
+                    <!-- Experience Item 1 -->
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Intervenant Technique</h3>
+                                <span class="date">Sept. 2025 - Présent</span>
+                            </div>
+                            <h4 class="company">CESI · Indépendant (La Rochelle)</h4>
+                            <p class="timeline-desc">
+                                Intervenant technique en infrastructure, système et réseaux pour des élèves de Master
+                                (MALSI) et Licence (Bachelors ASR).
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>Infrastructure</li>
+                                <li>Réseaux</li>
+                                <li>Pédagogie</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 2 -->
+                    <div class="timeline-item animate-on-scroll delay-1">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Ingénieur Système et Infrastructure</h3>
+                                <span class="date">Févr. 2025 - Présent</span>
+                            </div>
+                            <h4 class="company">Groupe Covéa (Niort)</h4>
+                            <p class="timeline-desc">
+                                Mise en œuvre et gestion d'infrastructures cloud et locales. Démarche DevSecOps,
+                                certification CIS CAT (OSE) et mise en place de tableaux de bord Grafana.
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>DevSecOps</li>
+                                <li>Grafana</li>
+                                <li>Sécurité</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 3 -->
+                    <div class="timeline-item animate-on-scroll delay-2">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Stagiaire en Laboratoire Universitaire</h3>
+                                <span class="date">Févr. 2024 - Août 2024</span>
+                            </div>
+                            <h4 class="company">Massey University (Auckland, NZ)</h4>
+                            <p class="timeline-desc">
+                                Création et programmation de serveur physique / architecture IoT. Création de dashboards
+                                basés sur des modules Arduino. Formation au Machine Learning. Rédaction d'un article de
+                                recherche en anglais sur le forecasting IoT.
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>IoT</li>
+                                <li>Machine Learning</li>
+                                <li>Arduino</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 4 -->
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Stagiaire en Développement</h3>
+                                <span class="date">Sept. 2022 - Déc. 2022</span>
+                            </div>
+                            <h4 class="company">Kapsül Teknoloji Platformu (Turquie)</h4>
+                            <p class="timeline-desc">
+                                Membre de la section "Ville Intelligente". Développement d'un jeu vidéo mobile en C#
+                                sous Unity permettant de visiter virtuellement la ville.
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>C#</li>
+                                <li>Unity</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 5 -->
+                    <div class="timeline-item animate-on-scroll delay-1">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Alternant Informatique</h3>
+                                <span class="date">Sept. 2021 - Sept. 2022</span>
+                            </div>
+                            <h4 class="company">ADEI 17 (Aytré)</h4>
+                            <p class="timeline-desc">
+                                Gestion quotidienne du service informatique : support technique, changement de postes,
+                                configuration et mise en place de switch niveau 2 pour la téléphonie IP. Déploiement
+                                d'un projet de supervision Centreon sous environnement Linux.
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>Linux</li>
+                                <li>Centreon</li>
+                                <li>Réseaux</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Experience Item 6 -->
+                    <div class="timeline-item animate-on-scroll delay-2">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="role">Stagiaire en Informatique</h3>
+                                <span class="date">Avr. 2021 - Juil. 2021</span>
+                            </div>
+                            <h4 class="company">CGO Expertise Comptable (Fontcouverte)</h4>
+                            <p class="timeline-desc">
+                                Mise en place de machines virtuelles Linux en production. Recherche de solutions et
+                                implémentation d'un serveur de logs visant à centraliser toutes les remontées de
+                                l'entreprise (Stack Graylog, Elastic, SLK).
+                            </p>
+                            <ul class="timeline-tags">
+                                <li>Elastic</li>
+                                <li>Graylog</li>
+                                <li>Virtualisation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="skills section" id="skills">
+            <div class="container">
+                <div class="section-header animate-on-scroll">
+                    <h2 class="section-title">Mes Compétences</h2>
+                    <div class="section-line"></div>
+                    <p class="section-subtitle">Un aperçu de mon expertise et des outils que j'utilise au quotidien.</p>
+                </div>
+
+                <div class="skills-grid">
+                    <!-- Skill Card 1 -->
+                    <div class="skill-card animate-on-scroll">
+                        <div class="skill-icon">
+                            <!-- Server / Tech Icon -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                                <line x1="6" y1="6" x2="6.01" y2="6" />
+                                <line x1="6" y1="18" x2="6.01" y2="18" />
+                            </svg>
+                        </div>
+                        <h3 class="skill-title">Touche à tout</h3>
+                        <p class="skill-desc">Polyvalent par nature, j'aime explorer et maîtriser de nouvelles
+                            technologies à chaque niveau de l'infrastructure.</p>
+                    </div>
+
+                    <!-- Skill Card 2 -->
+                    <div class="skill-card animate-on-scroll delay-1">
+                        <div class="skill-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                                <polyline points="2 17 12 22 22 17" />
+                                <polyline points="2 12 12 17 22 12" />
+                            </svg>
+                        </div>
+                        <h3 class="skill-title">Architecture</h3>
+                        <p class="skill-desc">Conception de systèmes scalables, maintenables et pensés pour évoluer avec
+                            les besoins de l'entreprise.</p>
+                    </div>
+
+                    <!-- Skill Card 3 -->
+                    <div class="skill-card animate-on-scroll delay-2">
+                        <div class="skill-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 16v-4" />
+                                <path d="M12 8h.01" />
+                            </svg>
+                        </div>
+                        <h3 class="skill-title">Analyse & Stratégie</h3>
+                        <p class="skill-desc">Capacité à traduire des besoins complexes en plans d'action mesurables et
+                            efficaces.</p>
+                    </div>
+                </div>
+
+                <div class="tech-stack animate-on-scroll">
+                    <h3>Technologies & Outils de prédilection</h3>
+                    <div class="tags-container">
+                        <span class="tag">Linux</span>
+                        <span class="tag">DevSecOps</span>
+                        <span class="tag">Grafana</span>
+                        <span class="tag">CentOS / Debian</span>
+                        <span class="tag">Virtualisation</span>
+                        <span class="tag">Centreon</span>
+                        <span class="tag">Elastic & Graylog</span>
+                        <span class="tag">Architecture Réseaux</span>
+                        <span class="tag">Scripting & Automatisation</span>
+                        <span class="tag">IoT</span>
+                        <span class="tag">Machine Learning</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact section alt-bg" id="contact">
+            <div class="container contact-container">
+                <!-- Collaboration Card -->
+                <div class="contact-card animate-on-scroll">
+                    <h2 class="contact-title">Prêt à collaborer ?</h2>
+                    <p class="contact-desc">
+                        Je suis toujours ouvert aux nouvelles opportunités professionnelles, aux défis techniques et aux
+                        échanges enrichissants.
+                    </p>
+                    <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank" rel="noopener noreferrer"
+                        class="btn btn-primary">
+                        Me retrouver sur LinkedIn
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                            <rect x="2" y="9" width="4" height="12" />
+                            <circle cx="4" cy="4" r="2" />
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Company Info Card -->
+                <div class="contact-card animate-on-scroll delay-1">
+                    <h2 class="contact-title">Formation Brice Info</h2>
+                    <p class="contact-company-label">
+                        Micro-Entreprise Formation
+                    </p>
+                    <div class="contact-details">
+                        <p><strong>SIREN :</strong> 101612950</p>
+                        <p><strong>SIRET :</strong> 10161295000010</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="#" class="brand-logo">
+                    <span class="brand-text">BD</span><span class="brand-dot">.</span>
+                </a>
+                <p>Création numérique & Innovation.</p>
+            </div>
+
+            <div class="footer-links">
+                <a href="ansible" class="tech-link" aria-label="Ansible" title="Ansible">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                        <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm4.293 17.293l-4.087-9.705-4.1 9.705-.206.487h-.001l6.394-4.728 2.207 5.228-.207-.987zM12.207 6.952l3.005 7.127-5.002 3.697 1.997-10.824z" />
+                    </svg>
+                </a>
+                <a href="terraform" class="tech-link" aria-label="Terraform" title="Terraform">
+                    <svg viewBox="0 0 256 256" width="48" height="48" fill="currentColor">
+                        <path
+                            d="M153.254.013v81.168l70.158 40.522V40.505L153.254.013zm-81.338 46.993v81.144L142.064 168.7V87.53L71.916 47.005zm0 94.01V222.16L142.064 256v-81.168l-70.148-33.816zm-71.916.032v81.169l70.148 40.513v-81.159L0 141.047z" />
+                    </svg>
+                </a>
+                <a href="fullstack" class="tech-link" aria-label="Fullstack" title="Fullstack">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                </a>
+                <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank" rel="noopener noreferrer"
+                    aria-label="LinkedIn" class="tech-link footer-linkedin">LinkedIn</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; <span id="currentYear"></span> Brice Doublet. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript File -->
+    <script src="assets/script.js"></script>
+</body>
+
+</html>

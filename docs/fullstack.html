@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Développement Web Full-Stack Cloud par Brice Doublet. Solutions modernes avec Supabase et GitHub Pages.">
+    <title>Full-Stack Dev | Brice Doublet</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+        integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+        integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+        integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d"
+        crossorigin="anonymous"></script>
+
+    <style>
+        /* ===== Full-Stack Page Specific Styles ===== */
+        :root {
+            --fs-cyan: #00C9A7;
+            --fs-dark-cyan: #00897B;
+            --fs-glow: rgba(0, 201, 167, 0.2);
+        }
+
+        /* Essential background fixes */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Abstract Grid Background */
+        .fs-bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 201, 167, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 201, 167, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Overriding primary button color */
+        .btn-primary-fs {
+            background-color: var(--fs-cyan);
+            color: #121212;
+            border: 2px solid var(--fs-cyan);
+        }
+
+        .btn-primary-fs:hover {
+            background-color: var(--fs-dark-cyan);
+            border-color: var(--fs-dark-cyan);
+            color: #fff;
+            box-shadow: 0 8px 25px var(--fs-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Title Gradients */
+        .fs-title,
+        .fs-section-title {
+            background: linear-gradient(135deg, var(--fs-cyan) 0%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            padding-bottom: 0.1em;
+            letter-spacing: -2px;
+        }
+
+        .fs-title {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            line-height: 1.1;
+            margin-right: 0.2em;
+        }
+
+        /* Ensure section subtitles/tags are cyan */
+        .fs-section-tag,
+        .fs-badge {
+            color: var(--fs-cyan);
+            border-color: rgba(0, 201, 167, 0.3);
+            z-index: 10;
+            position: relative;
+        }
+
+        .fs-section-tag {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .fs-section-desc {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Hero 3D Area */
+        .fs-hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .fs-hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .fs-hero-text {
+            z-index: 2;
+        }
+
+        .fs-hero-3d {
+            position: relative;
+            height: 550px;
+            width: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        #fs-canvas-3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        /* Transparent Web Page Mockup Overlay */
+        .fs-hero-mockup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-35%, -50%);
+            width: 380px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 201, 167, 0.4);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            padding: 30px;
+            pointer-events: none;
+            box-shadow:
+                0 40px 100px rgba(0, 0, 0, 0.4),
+                inset 0 0 20px rgba(0, 201, 167, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .mock-nav {
+            width: 100%;
+            height: 24px;
+            background: rgba(0, 201, 167, 0.15);
+            border-radius: 6px;
+        }
+
+        .mock-hero {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 201, 167, 0.08);
+            border-radius: 12px;
+        }
+
+        .mock-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .mock-card {
+            height: 160px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .mock-cursor {
+            position: absolute;
+            top: 40%;
+            left: 45%;
+            font-size: 32px;
+            z-index: 60;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+            pointer-events: none;
+        }
+
+        .fs-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            max-width: 540px;
+        }
+
+        /* Architecture Section */
+        .fs-arch-section {
+            padding: 120px 0;
+            background-color: var(--bg-alt);
+            position: relative;
+            z-index: 1;
+        }
+
+        .fs-arch-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+
+        #fs-arch-canvas {
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            border-radius: 20px;
+            background: rgba(13, 17, 23, 0.2);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ============================================
+           LILY NAILS SHOWCASE — Interactive Demo
+           ============================================ */
+        .lily-showcase {
+            padding: 120px 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .lily-showcase::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .lily-showcase::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 201, 167, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .lily-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .lily-header .fs-section-tag {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 100px;
+            background: rgba(0, 201, 167, 0.08);
+            border: 1px solid rgba(0, 201, 167, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .lily-header .fs-section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 16px;
+        }
+
+        /* === Device Mockup Section === */
+        .lily-demo-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: start;
+            margin-bottom: 80px;
+        }
+
+        /* Laptop Mockup */
+        .lily-laptop {
+            position: relative;
+            perspective: 1200px;
+        }
+
+        .lily-laptop-frame {
+            background: #1a1a1a;
+            border-radius: 16px 16px 0 0;
+            padding: 12px 12px 0;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+            position: relative;
+        }
+
+        .lily-laptop-notch {
+            width: 60px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin: 0 auto 10px;
+        }
+
+        .lily-laptop-screen {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border-radius: 4px 4px 0 0;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+        }
+
+        .lily-laptop-base {
+            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+            height: 18px;
+            border-radius: 0 0 8px 8px;
+            position: relative;
+        }
+
+        .lily-laptop-base::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 6px;
+            background: #0f0f0f;
+            border-radius: 0 0 20px 20px;
+        }
+
+        /* Screen Content — Mini Website */
+        .lily-screen-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lily-mini-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid rgba(236, 72, 153, 0.15);
+        }
+
+        .lily-mini-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #db2777;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lily-mini-links {
+            display: flex;
+            gap: 10px;
+            font-size: 7px;
+            color: #6b7280;
+        }
+
+        .lily-mini-links span {
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .lily-mini-links .active {
+            background: #fdf2f8;
+            color: #db2777;
+        }
+
+        .lily-mini-hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(253, 242, 248, 0.9), rgba(252, 231, 243, 0.9));
+            position: relative;
+        }
+
+        .lily-mini-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('images/lily/nail-art-1.png') center/cover no-repeat;
+            opacity: 0.08;
+        }
+
+        .lily-mini-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lily-mini-subtitle {
+            font-size: 8px;
+            color: #6b7280;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lily-mini-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            background: #ec4899;
+            color: white;
+            border-radius: 20px;
+            font-size: 7px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .lily-mini-services {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .lily-mini-service {
+            text-align: center;
+            padding: 8px 4px;
+            border-radius: 8px;
+            background: rgba(253, 242, 248, 0.5);
+            border: 1px solid rgba(236, 72, 153, 0.08);
+        }
+
+        .lily-mini-service-icon {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .lily-mini-service-name {
+            font-size: 6px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .lily-mini-service-price {
+            font-size: 5px;
+            color: #ec4899;
+            font-weight: 700;
+        }
+
+        /* Phone mockup */
+        .lily-phone {
+            position: absolute;
+            right: -30px;
+            bottom: -40px;
+            z-index: 10;
+            width: 140px;
+        }
+
+        .lily-phone-frame {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .lily-phone-notch {
+            width: 40px;
+            height: 5px;
+            background: #333;
+            border-radius: 3px;
+            margin: 0 auto 4px;
+        }
+
+        .lily-phone-screen {
+            width: 100%;
+            aspect-ratio: 9 / 19;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #fdf2f8, #fce7f3);
+        }
+
+        /* Phone Fidélité Screen */
+        .lily-fidelity-screen {
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            height: 100%;
+        }
+
+        .lily-fid-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 9px;
+            font-weight: 700;
+            color: #db2777;
+            text-align: center;
+        }
+
+        .lily-fid-card {
+            width: 100%;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            border-radius: 8px;
+            padding: 8px;
+            color: white;
+            text-align: center;
+        }
+
+        .lily-fid-name {
+            font-size: 7px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .lily-fid-points-label {
+            font-size: 5px;
+            opacity: 0.8;
+        }
+
+        .lily-fid-points {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .lily-fid-stars {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 4px;
+        }
+
+        .lily-fid-star {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .lily-fid-star.filled {
+            background: white;
+        }
+
+        .lily-fid-qr {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 6px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* CSS QR pattern */
+            background-image:
+                linear-gradient(45deg, #333 25%, transparent 25%),
+                linear-gradient(-45deg, #333 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #333 75%),
+                linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 8px 8px;
+            background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+        }
+
+        .lily-fid-label {
+            font-size: 5px;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        /* === Feature Grid === */
+        .lily-info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .lily-project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .lily-meta-tag {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .lily-project-title {
+            font-size: 2.5rem;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .lily-project-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .lily-link {
+            color: var(--fs-cyan);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+
+        .lily-link:hover {
+            color: var(--fs-dark-cyan);
+        }
+
+        .lily-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .lily-feature {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .lily-feature:hover {
+            border-color: rgba(0, 201, 167, 0.3);
+            background: rgba(0, 201, 167, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .lily-feature-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(0, 201, 167, 0.08);
+        }
+
+        .lily-feature-text h4 {
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .lily-feature-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* === Stats Bar === */
+        .lily-stats-bar {
+            display: flex;
+            gap: 40px;
+            padding: 30px 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .lily-stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .lily-stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: var(--fs-cyan);
+            line-height: 1;
+        }
+
+        .lily-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* === Reviews === */
+        .lily-reviews {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .lily-review {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .lily-review:hover {
+            border-color: rgba(236, 72, 153, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .lily-review-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .lily-review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .lily-review-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .lily-review-stars {
+            color: #facc15;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .lily-review-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .lily-cta-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 40px;
+        }
+
+        .btn-lily {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-lily:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
+            color: #fff;
+        }
+
+        /* === Tech Stack Cards === */
+        .fs-tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .fs-tech-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 20px;
+            transition: all 0.4s;
+            text-align: center;
+        }
+
+        .fs-tech-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--fs-cyan);
+            background: rgba(0, 201, 167, 0.05);
+            box-shadow: 0 20px 40px var(--fs-glow);
+        }
+
+        .fs-tech-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--fs-cyan);
+        }
+
+        .fs-tech-card h3 {
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .fs-tech-card p {
+            color: var(--text-muted);
+        }
+
+        /* Cyan overrides for global elements */
+        .contact-card::before,
+        .section-line {
+            background: var(--fs-cyan);
+        }
+
+        .contact-company-label {
+            color: var(--fs-cyan);
+        }
+
+        .footer-links a:hover,
+        .tech-link:hover {
+            color: var(--fs-cyan);
+        }
+
+        .brand-dot {
+            color: var(--fs-cyan);
+        }
+
+        .active-tech {
+            color: var(--fs-cyan);
+        }
+
+        /* Reveal utility for GSAP */
+        .fs-reveal {
+            opacity: 1;
+        }
+
+        /* =============================================
+           RESPONSIVE
+           ============================================= */
+        @media (max-width: 992px) {
+            .fs-hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .fs-hero-text {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .fs-hero-3d {
+                order: 1;
+                height: 350px;
+            }
+
+            .fs-hero-mockup {
+                width: 280px;
+                height: 380px;
+                transform: translate(-50%, -50%);
+                padding: 15px;
+            }
+
+            .mock-cursor {
+                font-size: 24px;
+            }
+
+            .lily-demo-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .lily-phone {
+                position: relative;
+                right: auto;
+                bottom: auto;
+                margin: 20px auto 0;
+            }
+
+            .lily-laptop {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .lily-reviews {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .fs-tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .lily-features {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lily-reviews {
+                grid-template-columns: 1fr;
+            }
+
+            .lily-features {
+                grid-template-columns: 1fr;
+            }
+
+            .lily-stats-bar {
+                flex-direction: column;
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .lily-mini-services {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .lily-project-title {
+                font-size: 1.8rem;
+            }
+
+            .lily-cta-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .fs-tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .hero-cta .btn {
+                width: 100%;
+            }
+
+            .fs-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .lily-demo-grid {
+                gap: 24px;
+            }
+
+            .lily-phone {
+                width: 120px;
+            }
+
+            .lily-stats-bar {
+                gap: 16px;
+            }
+
+            .lily-stat-number {
+                font-size: 1.6rem;
+            }
+
+            .fs-hero-mockup {
+                display: none;
+            }
+
+            .fs-hero-3d {
+                height: 250px;
+            }
+
+            .lily-mini-services {
+                grid-template-columns: 1fr;
+            }
+
+            .lily-showcase,
+            .fs-arch-section {
+                padding: 60px 0;
+            }
+
+            .lily-header {
+                margin-bottom: 40px;
+            }
+
+            .fs-hero {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fs-bg-grid"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="home" class="brand-logo">
+                <span class="brand-text">BD</span><span class="brand-dot">.</span>
+            </a>
+            <nav class="nav-links">
+                <a href="home" class="nav-link">Retour à l'accueil</a>
+                <a href="ansible" class="nav-link">Ansible</a>
+                <a href="terraform" class="nav-link">Terraform</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== HERO ===== -->
+        <section class="fs-hero">
+            <div class="fs-hero-grid">
+                <div class="fs-hero-text fs-reveal">
+                    <div class="fs-badge">Developer</div>
+                    <h1 class="fs-title">FullStack</h1>
+                    <p class="fs-subtitle">Architecte de solutions numériques agiles. Intégration transparente entre
+                        interface utilisateur et services Cloud.</p>
+                    <div class="hero-cta hero-cta-left">
+                        <a href="home" class="btn btn-primary-fs">Retour à l'accueil</a>
+                        <a href="#case-study" class="btn btn-secondary">Voir le projet Lily ↓</a>
+                    </div>
+                </div>
+                <div class="fs-hero-3d">
+                    <div class="fs-hero-mockup fs-reveal">
+                        <div class="mock-nav"></div>
+                        <div class="mock-hero"></div>
+                        <div class="mock-grid">
+                            <div class="mock-card"></div>
+                            <div class="mock-card"></div>
+                        </div>
+                        <div class="mock-cursor" id="mock-cursor">🖱️</div>
+                    </div>
+                    <canvas id="fs-canvas-3d" aria-label="Animation 3D interactive Full-Stack" role="img"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ARCHITECTURE CLOUD ===== -->
+        <section class="fs-arch-section">
+            <div class="container">
+                <div class="section-header fs-reveal">
+                    <div class="fs-section-tag">Architecture</div>
+                    <h2 class="fs-section-title">Écosystème Full Cloud</h2>
+                    <p class="fs-section-desc">Une infrastructure légère, sans serveur à
+                        gérer, pour une performance maximale et des coûts maîtrisés.</p>
+                </div>
+                <div class="fs-arch-container">
+                    <canvas id="fs-arch-canvas" class="fs-reveal" aria-label="Diagramme d'architecture cloud" role="img"></canvas>
+                    <div class="fs-tech-grid">
+                        <div class="fs-tech-card fs-reveal">
+                            <h3>GitHub Pages</h3>
+                            <p>Hébergement statique haute performance avec déploiement continu automatisé.</p>
+                        </div>
+                        <div class="fs-tech-card fs-reveal">
+                            <h3>Supabase</h3>
+                            <p>Base de données PostgreSQL temps réel, authentification sécurisée et stockage fichiers.
+                            </p>
+                        </div>
+                        <div class="fs-tech-card fs-reveal">
+                            <h3>OVH DNS</h3>
+                            <p>Gestion professionnelle des noms de domaine et redirection DNS optimisée.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CASE STUDY: LILY NAILS STUDIO ===== -->
+        <section class="lily-showcase" id="case-study">
+            <div class="container">
+                <!-- Header -->
+                <div class="lily-header fs-reveal">
+                    <div class="fs-section-tag">Projet Client</div>
+                    <h2 class="fs-section-title">Lily Nails Studio</h2>
+                    <p class="fs-section-desc">Une solution digitale complète pour un institut de beauté : vitrine
+                        web, programme de fidélité, dashboard admin et PWA installable.</p>
+                </div>
+
+                <!-- Demo Grid: Mockups + Info -->
+                <div class="lily-demo-grid">
+                    <!-- Left: Device Mockups -->
+                    <div class="lily-laptop fs-reveal">
+                        <div class="lily-laptop-frame">
+                            <div class="lily-laptop-notch"></div>
+                            <div class="lily-laptop-screen">
+                                <div class="lily-screen-content">
+                                    <!-- Mini Navigation -->
+                                    <div class="lily-mini-nav">
+                                        <div class="lily-mini-logo">🌸 Lily Nail Studio</div>
+                                        <div class="lily-mini-links">
+                                            <span class="active">Accueil</span>
+                                            <span>Services</span>
+                                            <span>Galerie</span>
+                                            <span>Contact</span>
+                                        </div>
+                                    </div>
+                                    <!-- Mini Hero -->
+                                    <div class="lily-mini-hero">
+                                        <div class="lily-mini-subtitle">Bienvenue chez</div>
+                                        <div class="lily-mini-title">Lily Nail Studio</div>
+                                        <div class="lily-mini-subtitle">Prothésiste ongulaire à Ferrières</div>
+                                        <div class="lily-mini-cta">📅 Prendre rendez-vous</div>
+                                    </div>
+                                    <!-- Mini Services Grid -->
+                                    <div class="lily-mini-services">
+                                        <div class="lily-mini-service">
+                                            <div class="lily-mini-service-icon">✨</div>
+                                            <div class="lily-mini-service-name">Manucure</div>
+                                            <div class="lily-mini-service-price">à partir de 35€</div>
+                                        </div>
+                                        <div class="lily-mini-service">
+                                            <div class="lily-mini-service-icon">💎</div>
+                                            <div class="lily-mini-service-name">Pose Gel</div>
+                                            <div class="lily-mini-service-price">à partir de 45€</div>
+                                        </div>
+                                        <div class="lily-mini-service">
+                                            <div class="lily-mini-service-icon">🪄</div>
+                                            <div class="lily-mini-service-name">Extensions</div>
+                                            <div class="lily-mini-service-price">à partir de 50€</div>
+                                        </div>
+                                        <div class="lily-mini-service">
+                                            <div class="lily-mini-service-icon">🧖</div>
+                                            <div class="lily-mini-service-name">Beauté Pieds</div>
+                                            <div class="lily-mini-service-price">à partir de 35€</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lily-laptop-base"></div>
+
+                        <!-- Phone Overlay -->
+                        <div class="lily-phone fs-reveal">
+                            <div class="lily-phone-frame">
+                                <div class="lily-phone-notch"></div>
+                                <div class="lily-phone-screen">
+                                    <div class="lily-fidelity-screen">
+                                        <div class="lily-fid-header">🎁 Fidélité</div>
+                                        <div class="lily-fid-card">
+                                            <div class="lily-fid-name">Carte de Fidélité</div>
+                                            <div class="lily-fid-points-label">Vos points</div>
+                                            <div class="lily-fid-points">6</div>
+                                            <div class="lily-fid-stars">
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star filled"></div>
+                                                <div class="lily-fid-star"></div>
+                                                <div class="lily-fid-star"></div>
+                                                <div class="lily-fid-star"></div>
+                                                <div class="lily-fid-star"></div>
+                                            </div>
+                                        </div>
+                                        <div class="lily-fid-qr"></div>
+                                        <div class="lily-fid-label">Scanner pour valider</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Project Info -->
+                    <div class="lily-info-panel fs-reveal">
+                        <div>
+                            <div class="lily-project-meta">
+                                <span class="lily-meta-tag">PWA</span>
+                                <span class="lily-meta-tag">VANILLA JS</span>
+                                <span class="lily-meta-tag">SUPABASE</span>
+                                <span class="lily-meta-tag">QR CODE</span>
+                                <span class="lily-meta-tag">RGPD</span>
+                            </div>
+                            <h3 class="lily-project-title">Fidélité Connectée</h3>
+                            <p class="lily-project-desc">
+                                Digitalisation complète du parcours client, remplaçant les cartes papier par une
+                                Web App installable. Système d'authentification, carte de fidélité numérique avec
+                                QR code, dashboard admin temps réel et conformité RGPD.
+                            </p>
+                        </div>
+
+                        <!-- Feature Grid -->
+                        <div class="lily-features">
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>Vitrine Digitale</h4>
+                                    <p>Site responsive avec galerie, services et avis clients</p>
+                                </div>
+                            </div>
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>Auth Supabase</h4>
+                                    <p>Inscription par email, reset password, sessions sécurisées</p>
+                                </div>
+                            </div>
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>Fidélité Gamifiée</h4>
+                                    <p>Points après chaque visite, paliers de récompenses</p>
+                                </div>
+                            </div>
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>PWA Installable</h4>
+                                    <p>Mode hors-ligne, icône d'accueil, service worker</p>
+                                </div>
+                            </div>
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>Dashboard Admin</h4>
+                                    <p>Gestion clients, attribution points, statistiques</p>
+                                </div>
+                            </div>
+                            <div class="lily-feature">
+                                <div class="lily-feature-text">
+                                    <h4>RGPD Compliant</h4>
+                                    <p>Données chiffrées, RLS PostgreSQL, suppression en 1 clic</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="lily-stats-bar">
+                            <div class="lily-stat">
+                                <div class="lily-stat-number">5.0 ★</div>
+                                <div class="lily-stat-label">Avis Google</div>
+                            </div>
+                            <div class="lily-stat">
+                                <div class="lily-stat-number">100%</div>
+                                <div class="lily-stat-label">Disponibilité</div>
+                            </div>
+                            <div class="lily-stat">
+                                <div class="lily-stat-number">PWA</div>
+                                <div class="lily-stat-label">Installable</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Reviews -->
+                <div class="lily-reviews fs-reveal">
+                    <div class="lily-review">
+                        <div class="lily-review-header">
+                            <div class="lily-review-avatar">M</div>
+                            <div>
+                                <div class="lily-review-name">Manon Langlais</div>
+                                <div class="lily-review-stars">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="lily-review-text">"Meilleure salon pour les ongles ! Lily est perfectionniste, à
+                            l'écoute, et pleine de bons conseils. Je suis trop satisfaite de mes ongles chez elle !"</p>
+                    </div>
+                    <div class="lily-review">
+                        <div class="lily-review-header">
+                            <div class="lily-review-avatar">C</div>
+                            <div>
+                                <div class="lily-review-name">COLLET Maëva</div>
+                                <div class="lily-review-stars">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="lily-review-text">"Super beau travail, très précise et soignée. Très gentille et à
+                            l'écoute et pas très cher pour le travail qu'elle propose. Je recommande x1000"</p>
+                    </div>
+                    <div class="lily-review">
+                        <div class="lily-review-header">
+                            <div class="lily-review-avatar">E</div>
+                            <div>
+                                <div class="lily-review-name">Emma</div>
+                                <div class="lily-review-stars">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="lily-review-text">"Tellement contente d'avoir trouvé une prothésiste si douée et
+                            passionnée. Mesdames ET Messieurs, allez la découvrir c'est un conseil !"</p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="lily-cta-row fs-reveal">
+                    <a href="https://lilynailstudio.fr" target="_blank" rel="noopener noreferrer" class="btn-lily">
+                        🌸 Visiter lilynailstudio.fr
+                    </a>
+                    <a href="#contact" class="btn btn-primary-fs">Lancer votre projet →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SKILLS / TECH STACK ===== -->
+        <section class="skills section alt-bg" id="skills">
+            <div class="container">
+                <div class="section-header fs-reveal">
+                    <div class="fs-section-tag">Compétences</div>
+                    <h2 class="fs-section-title">Maîtrise Technique</h2>
+                    <p class="fs-section-desc">Des outils modernes pour des applications
+                        web rapides et sécurisées.</p>
+                </div>
+                <div class="fs-tech-grid">
+                    <div class="fs-tech-card fs-reveal">
+                        <div class="fs-tech-icon">JS</div>
+                        <h3>Vanilla JavaScript</h3>
+                        <p>ES6+, manipulation du DOM native pour une légèreté absolue
+                            sans framework lourd.</p>
+                    </div>
+                    <div class="fs-tech-card fs-reveal">
+                        <div class="fs-tech-icon">SQL</div>
+                        <h3>PostgreSQL</h3>
+                        <p>Architecture de données robuste, Row Level Security (RLS)
+                            et fonctions sécurisées.</p>
+                    </div>
+                    <div class="fs-tech-card fs-reveal">
+                        <div class="fs-tech-icon">PWA</div>
+                        <h3>PWA (Progressive Web App)</h3>
+                        <p>Expérience proche du natif : mode hors-ligne, icône sur
+                            écran d'accueil et rapidité.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTACT / MICRO-ENTREPRISE ===== -->
+        <section class="contact section" id="contact">
+            <div class="container contact-container">
+                <div class="contact-card fs-reveal">
+                    <h2 class="contact-title">Démarrons votre projet</h2>
+                    <p class="contact-desc">Besoin d'un site web performant et un
+                        écosystème cloud sur mesure ?</p>
+                    <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank" rel="noopener noreferrer"
+                        class="btn btn-primary-fs">
+                        Me contacter sur LinkedIn
+                    </a>
+                </div>
+
+                <div class="contact-card fs-reveal">
+                    <h2 class="contact-title">Formation Brice Info</h2>
+                    <p class="contact-company-label">Micro-Entreprise Development &
+                        Formation</p>
+                    <div class="contact-details">
+                        <p><strong>SIREN :</strong> 101612950</p>
+                        <p><strong>SIRET :</strong> 10161295000010</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="home" class="brand-logo">
+                    <span class="brand-text">BD</span><span class="brand-dot">.</span>
+                </a>
+                <p>Création numérique & Innovation.</p>
+            </div>
+            <div class="footer-links">
+                <a href="ansible" class="tech-link" aria-label="Ansible" title="Ansible">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path
+                            d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm4.293 17.293l-4.087-9.705-4.1 9.705-.206.487h-.001l6.394-4.728 2.207 5.228-.207-.987zM12.207 6.952l3.005 7.127-5.002 3.697 1.997-10.824z" />
+                    </svg>
+                </a>
+                <a href="terraform" class="tech-link" aria-label="Terraform" title="Terraform">
+                    <svg viewBox="0 0 256 256" width="24" height="24" fill="currentColor">
+                        <path
+                            d="M153.254.013v81.168l70.158 40.522V40.505L153.254.013zm-81.338 46.993v81.144L142.064 168.7V87.53L71.916 47.005zm0 94.01V222.16L142.064 256v-81.168l-70.148-33.816zm-71.916.032v81.169l70.148 40.513v-81.159L0 141.047z" />
+                    </svg>
+                </a>
+                <a href="fullstack.html" class="tech-link active-tech" aria-label="Fullstack" title="Fullstack">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/brice-doublet/" target="_blank"
+                    rel="noopener noreferrer">LinkedIn</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="currentYear"></span> Brice Doublet. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="assets/script.js"></script>
+    <script src="assets/fullstack.js"></script>
+</body>
+
+</html>

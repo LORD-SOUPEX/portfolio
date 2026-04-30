@@ -57,6 +57,26 @@ export default function ArchDiagram() {
     window.addEventListener('resize', resize);
     resize();
 
+    // Fallback for ctx.roundRect (multi-browser compatibility)
+    const drawRoundedRect = (x, y, w, h, r) => {
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y, w, h, r);
+      } else {
+        // Simple manual rounded rect if API is not supported
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+    };
+
     function drawWindow(win, index) {
       const scale = width < 600 ? 0.7 : 1;
       const w = win.w * scale;
@@ -69,7 +89,7 @@ export default function ArchDiagram() {
       
       ctx.fillStyle = '#1e1e1e';
       ctx.beginPath();
-      ctx.roundRect(x, y, w, h, 12);
+      drawRoundedRect(x, y, w, h, 12);
       ctx.fill();
       ctx.strokeStyle = win.color + '44';
       ctx.stroke();
@@ -78,7 +98,11 @@ export default function ArchDiagram() {
 
       ctx.fillStyle = '#2a2a2a';
       ctx.beginPath();
-      ctx.roundRect(x, y, w, 35 * scale, {tl: 12, tr: 12, bl: 0, br: 0});
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y, w, 35 * scale, {tl: 12, tr: 12, bl: 0, br: 0});
+      } else {
+        drawRoundedRect(x, y, w, 35 * scale, 12); // Fallback: all corners rounded
+      }
       ctx.fill();
 
       ctx.fillStyle = '#a0a0a0';
@@ -88,7 +112,7 @@ export default function ArchDiagram() {
 
       ctx.fillStyle = '#121212';
       ctx.beginPath();
-      ctx.roundRect(x + 10, y + 45 * scale, w - 20, h - (55 * scale), 6);
+      drawRoundedRect(x + 10, y + 45 * scale, w - 20, h - (55 * scale), 6);
       ctx.fill();
 
       ctx.fillStyle = win.color;

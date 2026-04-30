@@ -1,0 +1,128 @@
+:root {
+  /* Colors */
+  --bg-main: #121212;
+  --bg-alt: #1a1a1a;
+  --bg-card: #222222;
+
+  --text-main: #fcfcfc;
+  --text-muted: #a0a0a0;
+
+  /* The "Jaune Cassé" Theme Color */
+  --accent-main: #e3b04b;
+  --accent-hover: #c99839;
+  --accent-glow: rgba(227, 176, 75, 0.15);
+
+  /* Typography */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Details */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+
+  /* Transitions & Animations */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --container-width: 1200px;
+  --section-padding: 100px 0;
+}
+
+/* Page-specific overrides */
+.page-ansible {
+  --accent-main: #ee0000;
+  --accent-glow: rgba(238, 0, 0, 0.1);
+}
+
+.page-terraform {
+  --accent-main: #E3B04B;
+  --accent-hover: #c99839;
+  --accent-glow: rgba(227, 176, 75, 0.15);
+}
+
+.page-fullstack {
+  --accent-main: #00c9a7;
+  --accent-glow: rgba(0, 201, 167, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+a {
+  color: var(--accent-main);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+.container {
+  width: 90%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+.section {
+  padding: var(--section-padding);
+}
+
+.alt-bg {
+  background-color: var(--bg-alt);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Animations Helper */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: var(--accent-main);
+  z-index: 9999;
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: width 0.1s ease-out;
+}
